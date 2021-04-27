@@ -1,4 +1,5 @@
 import yaml
+import pandas as pd
 
 import logging
 logging.basicConfig(
@@ -58,3 +59,7 @@ class Season(object):
 
     def name(self):
         return self.dict['name']
+    def start_date(self):
+        return pd.to_datetime(self.dict['start_date'])
+    def end_date(self):
+        return pd.to_datetime(self.dict['end_date'])

@@ -200,25 +200,30 @@ class AZMet(object):
                     urllib.request.urlretrieve(f'https://cals.arizona.edu/azmet/data/{filename}', filepath)
                 # Reference Evapotranspiration  (ETo) 
                 if key == "et":
+                    log.info(f"reading: {filepath}")
                     _df = pd.read_fwf(filepath, names=self.eto_columns, skiprows=17, skipfooter=7)
                     _df['date'] = pd.to_datetime([f"{y} {x.doy}" for i,x in _df.iterrows()], format='%Y %j')
-                    temp_df_lists[key].append(_df)
+                    temp_df_lists[key].append(_df[_df['date'].between(self.season.start_date(), self.season.end_date())])
                 # Heat Units 
                 elif key == "hu":
+                    log.info(f"reading: {filepath}")
                     _df = pd.read_fwf(filepath, names=self.hu_columns, skiprows=18, skipfooter=6)
                     _df['date'] = pd.to_datetime([f"{y} {x.doy}" for i,x in _df.iterrows()], format='%Y %j')
-                    temp_df_lists[key].append(_df)
+                    #temp_df_lists[key].append(_df)
+                    temp_df_lists[key].append(_df[_df['date'].between(self.season.start_date(), self.season.end_date())])
                 elif key == "rd":
-                    #print(f"{filepath}")
+                    log.info(f"reading: {filepath}")
                     #breakpoint()
                     _df = pd.read_csv(filepath, names=self.raw_daily_columns)
                     _df['date'] = pd.to_datetime([f"{int(x.year)} {int(x.doy)}" for i,x in _df.iterrows()], format='%Y %j')
-                    temp_df_lists[key].append(_df)
+                    #temp_df_lists[key].append(_df)
+                    temp_df_lists[key].append(_df[_df['date'].between(self.season.start_date(), self.season.end_date())])
                 elif key == "rh":
-                    print(f"{filepath}")
+                    log.info(f"reading: {filepath}")
                     _df = pd.read_csv(filepath, names=self.raw_hourly_columns)
-                    _df['date'] = pd.to_datetime([f"{int(x.year)} {int(x.doy)}" for i,x in _df.iterrows()], format='%Y %j')
-                    temp_df_lists[key].append(_df)
+                    _df['date'] = pd.to_datetime([f"{int(x.year)} {int(x.doy)} {int(x.hour)-1}" for i,x in _df.iterrows()], format='%Y %j %H')
+                    #temp_df_lists[key].append(_df)
+                    temp_df_lists[key].append(_df[_df['date'].between(self.season.start_date(), self.season.end_date())])
 
 
         self.eto_df = pd.concat(temp_df_lists['et'], axis=0, ignore_index=True)
