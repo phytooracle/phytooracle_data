@@ -1,3 +1,4 @@
+import sys
 import os.path
 import pdb
 import glob
@@ -7,7 +8,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
 
-from data.seasons import Season
+from phytooracle_data.seasons import Season
 
 import logging
 logging.basicConfig(
@@ -25,56 +26,64 @@ project_dir = os.path.dirname(env_file)
 data_dir    = parsed_dotenv["data_dir"]
 raw_data_dir    = parsed_dotenv["raw_data_dir"]
 
-class RGB(object):
+class RGB_Data(object):
     """
-    import data.rgb
-    rgb = data.rgb.RGB(season=10)
-    rgb.df.iloc[0]
+    from phytooracle_data.rgb import RGB_Data
+    rgb = RGB_Data(season=10)
+    df = rgb.df[ rgb.df.double_lettuce == 0 ]
     """
 
-    def __init__(self, season=10, force_download=False, remove_anomalous_dates=True):
+    def __init__(self, season=None, force_download=False, remove_anomalous_dates=True):
         
         """
         /iplant/home/shared/phytooracle/season_10_lettuce_yr_2020/level_3/stereoTop/season10_plant_clustering/stereoTop_full_season_clustering.csv
         """
 
-        self.season_label = Season.season_names[season]
+        if season is not None:
+            self.season = Season(season=season)
+        else:
+            log.critical(f"You must provide {self.__class__} with a season or start and end dates")
+            sys.exit(0)
 
-        download_data = False
+
+        # Figure out if we need to download the data.
+        need_to_download_data = False
         rgb_data_filename = 'stereoTop_full_season_clustering.csv'
-        season_dir_name = self.season_label
+        season_dir_name = self.season.name()
         rgb_data_rawdir = os.path.join(raw_data_dir, season_dir_name)
         rgb_data_filepath = os.path.join(rgb_data_rawdir, rgb_data_filename)
 
         if not os.path.isfile(rgb_data_filepath):
             # Data doesn't exist locally
             log.info(f"Didn't find {rgb_data_filepath}, fetching it with irods...")
-            download_data = True
+            need_to_download_data = True
         if force_download:
-            if not download_data:
+            if not need_to_download_data:
                 # Data exists locally, but we're going to overwrite it.
                 log.info(f"Found local rgb data, but we've been asked to re-download it with the force_download flag")
-                download_data = True
+                need_to_download_data = True
 
-        if download_data:
+        if need_to_download_data:
             os.makedirs(rgb_data_rawdir, exist_ok=True)
             import shutil
             if shutil.which('iget') is None:
-                log.error(f"You need to install irods so we can fetch the data")
+                log.critical(f"You need to install irods so we can fetch the data")
+                sys.exit(0)
             import subprocess
             # iget -N 0 -PVT /path/to/file
-            irods_path = f"/iplant/home/shared/phytooracle/{season_dir_name}/level_3/stereoTop/season10_plant_clustering/stereoTop_full_season_clustering.csv"
+            irods_path = f"/iplant/home/shared/phytooracle/{self.season.name()}/level_3/stereoTop/season10_plant_clustering/stereoTop_full_season_clustering.csv"
             result = subprocess.run(["iget", "-N", "0", "-PVT", irods_path])
             if result.returncode != 0:
-                log.error(f"iget did not complete successfully... {result}")
+                log.critical(f"iget did not complete successfully... {result}")
+                sys.exit(0)
             shutil.move(rgb_data_filename, rgb_data_filepath)
             
 
         logging.info(f"Reading RGB data from {rgb_data_filepath}")
         df = pd.read_csv(rgb_data_filepath)
         df.drop(['Unnamed: 0'], axis=1, inplace=True)
+        self.anomalous_dates = list(self.season.dict['anomalous_dates'].values())
         if remove_anomalous_dates:
-            self.anomalous_dates = Season.anomalous_dates[self.season_label]['rgb']
             df = df[ ~df.date.isin(self.anomalous_dates) ]
 
         #rgb_df  = rgb_df.melt( id_vars=["plant_name","plot"], var_name='date', value_name='rgb')
@@ -88,22 +97,35 @@ class RGB(object):
         plant_image_paths = glob.glob(os.path.join(path_to_images, plant_name))
         return plant_image_paths
 
-    def number_observations_by_date(self):
-        if not hasattr(self, 'n_obs_by_date'):
-            self.n_obs_by_date = self.df.groupby(by='date').size()
-        return self.n_obs_by_date
+    def number_observations_by_date(self, df=None):
+        if df is None:
+            df = self.df
+        return df.groupby(by='date').size()
         pass
 
-    def number_sequences(self):
-        plants = rgb.df.groupby(by='plant_name')
-        if not hasattr(self, 'n_obs_by_date'):
-            self.n_obs_by_date = self.df.groupby(by='date').size()
-        return self.n_obs_by_date
-        pass
+    def number_plants_with_n_observations(self, df=None):
+        """
+        How many plants have 13 total observations?  How many have 17?
+        returns a list of n, and how many plants have n observations.
+        """
+        if df is None:
+            df = self.df
+        return df.groupby(by='plant_name').size().value_counts().sort_index()
 
-    def plot_n_observations_vs_date_per_column(self, column_name):
-        if column_name in self.df.columns:
-            self.df.groupby(by=[column_name,'date']).size().unstack().T.plot()
+    def plot_number_observations_vs_date_per_column(self, column_name, df=None):
+        """
+        I think this should go into a visualization class.  I dont think we should
+        do this [NPH].  Leaving it here for reference.
+        """
+        if df is None:
+            df = self.df
+        if column_name in df.columns:
+            if type(column_name) is list:
+                # multiple columns passed to us
+                df.groupby(by=column_name+['date']).size().unstack().T.plot()
+            else:
+                # only one column passed to us
+                df.groupby(by=[column_name,'date']).size().unstack().T.plot()
             plt.show()
         else:
             log.warning(f"Can not plot_n_observations_vs_date_per_column with column: {column_name}")
