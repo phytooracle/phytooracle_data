@@ -131,6 +131,20 @@ class RGB_Data(object):
             log.warning(f"Can not plot_n_observations_vs_date_per_column with column: {column_name}")
 
 
+    def calculate_S(self, df):
+        if df is None:
+            df = self.df
+
+        grouped_plants = df.groupby(by='plant_name')
+
+        for plant_name, plant_row_idxs in grouped_plants.groups.items():
+            plant_data = df.loc[plant_row_idxs]
+            plant_data['S'] = plant_data.bounding_area_m2 / plant_data.bounding_area_m2.max()
+            df.loc[plant_row_idxs, 'S'] = plant_data['S']
+
+        return df
+
+
 """
 # Figure
 dates.size().plot(title="Season 10 #Plants w/ RGB", xlabel="date", ylabel="# Plants")
