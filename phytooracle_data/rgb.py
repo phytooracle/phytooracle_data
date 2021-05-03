@@ -92,44 +92,6 @@ class RGB_Data(object):
         df['date']  = df['date'].astype(np.datetime64)
         self.df = df
 
-    def get_images_of_plant(self, plant_name):
-        path_to_images = '/media/equant/7fe7f0a0-e17f-46d2-82d3-e7a8c25200bb/work/stereoTop/ind_plant_images'
-        plant_image_paths = glob.glob(os.path.join(path_to_images, plant_name))
-        return plant_image_paths
-
-    def number_observations_by_date(self, df=None):
-        if df is None:
-            df = self.df
-        return df.groupby(by='date').size()
-        pass
-
-    def number_plants_with_n_observations(self, df=None):
-        """
-        How many plants have 13 total observations?  How many have 17?
-        returns a list of n, and how many plants have n observations.
-        """
-        if df is None:
-            df = self.df
-        return df.groupby(by='plant_name').size().value_counts().sort_index()
-
-    def plot_number_observations_vs_date_per_column(self, column_name, df=None):
-        """
-        I think this should go into a visualization class.  I dont think we should
-        do this [NPH].  Leaving it here for reference.
-        """
-        if df is None:
-            df = self.df
-        if column_name in df.columns:
-            if type(column_name) is list:
-                # multiple columns passed to us
-                df.groupby(by=column_name+['date']).size().unstack().T.plot()
-            else:
-                # only one column passed to us
-                df.groupby(by=[column_name,'date']).size().unstack().T.plot()
-            plt.show()
-        else:
-            log.warning(f"Can not plot_n_observations_vs_date_per_column with column: {column_name}")
-
 
     def calculate_S(self, df):
         if df is None:
@@ -143,6 +105,31 @@ class RGB_Data(object):
             df.loc[plant_row_idxs, 'S'] = plant_data['S']
 
         return df
+
+
+    def plot_level_df(self, df):
+        if df is None:
+            df = self.df
+        if 'S' not in df.columns:
+            self.calculate_S(df)
+
+        plot_df = df.groupby(['plot', 'date']).agg(
+                    {
+                        'bounding_area_m2' : ['median', 'std'],
+                        'S'                : ['median', 'std'],
+                        'treatment'        : 'first',
+                        'genotype'         : 'first',
+                    }
+        )
+        plot_df.columns = ['bounding_area_m2', 'bounding_area_m2_std', 'S', 'S_std', 'treatment', 'genotype']
+        plot_df.reset_index(inplace=True)
+        plot_df['plot_name'] = plot_df['plot']
+        plot_df['plot'] = plot_df['plot'].str.replace('MAC_Field_Scanner_Season_10_', '')
+        plot_df[['range', 'column']] = plot_df['plot'].str.split("_Column_", n=1, expand=True)
+        plot_df['range'] = plot_df['range'].str.split('_', expand=True)[1].str.zfill(2)
+        plot_df['column'] = plot_df['column'].str.zfill(2)
+        plot_df['plot'] = plot_df['range']+plot_df['column']
+        return plot_df
 
 
 """
