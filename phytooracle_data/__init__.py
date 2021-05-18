@@ -31,3 +31,10 @@ def plot_number_observations_vs_date_per_column(column_name):
     else:
         log.warning(f"Can not plot_n_observations_vs_date_per_column with column: {column_name}")
 
+
+def return_plants_with_at_least_n_observations(filtered_df, min_n):
+    all_plants = filtered_df.groupby(by='plant_name')
+    all_plants_with_at_least_n_obs = all_plants.size()[ all_plants.size() > min_n ]
+    filtered_df = filtered_df[filtered_df.plant_name.isin(all_plants_with_at_least_n_obs.index)]
+    assert len(filtered_df.plant_name.unique()) == len(all_plants_with_at_least_n_obs), "Nathan screwed something up!"
+    return filtered_df

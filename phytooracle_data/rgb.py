@@ -17,14 +17,13 @@ logging.basicConfig(
 )
 log = logging.getLogger(__name__)
 
+
 # Deal with local machine paths, etc.
 import dotenv
 env_file = dotenv.find_dotenv()
 dotenv.load_dotenv(env_file)
 parsed_dotenv = dotenv.dotenv_values()
-project_dir = os.path.dirname(env_file)
-data_dir    = parsed_dotenv["data_dir"]
-raw_data_dir    = parsed_dotenv["raw_data_dir"]
+raw_data_dir  = parsed_dotenv["phytooracle_data"]
 
 class RGB_Data(object):
     """
@@ -107,11 +106,11 @@ class RGB_Data(object):
         return df
 
 
-    def plot_level_df(self, df):
+    def make_plot_level_df(self, df):
         if df is None:
             df = self.df
         if 'S' not in df.columns:
-            self.calculate_S(df)
+            df = self.calculate_S(df)
 
         plot_df = df.groupby(['plot', 'date']).agg(
                     {

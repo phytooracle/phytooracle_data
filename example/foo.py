@@ -85,4 +85,3 @@ print(f"Biggest single lettuce plant: {biggest_plant_name}")
 #fig, ax
 #for img in rgb_images_of_biggest_plant:
 #get_images_of_plant(self, plant_name):
-"""

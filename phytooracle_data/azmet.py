@@ -12,15 +12,11 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 # Deal with local machine paths, etc.
-try: 
-    import dotenv
-    env_file = dotenv.find_dotenv()
-    dotenv.load_dotenv(env_file)
-    parsed_dotenv = dotenv.dotenv_values()
-    raw_data_dir  = parsed_dotenv["raw_data_dir"]
-except:
-    log.warning(f"Using default data path since you do not have python dotenv installed or a .env file")
-    raw_data_dir  = '~/data/raw/'
+import dotenv
+env_file = dotenv.find_dotenv()
+dotenv.load_dotenv(env_file)
+parsed_dotenv = dotenv.dotenv_values()
+raw_data_dir  = parsed_dotenv["phytooracle_data"]
 
 azmet_data_dir = os.path.join(raw_data_dir, "azmet")
 
