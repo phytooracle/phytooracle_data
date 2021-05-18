@@ -17,7 +17,6 @@ logging.basicConfig(
 )
 log = logging.getLogger(__name__)
 
-
 # Deal with local machine paths, etc.
 import dotenv
 env_file = dotenv.find_dotenv()
