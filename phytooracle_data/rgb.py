@@ -8,6 +8,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
 
+
 from phytooracle_data.seasons import Season
 
 import logging
@@ -20,9 +21,11 @@ log = logging.getLogger(__name__)
 
 # Deal with local machine paths, etc.
 import dotenv
-env_file = dotenv.find_dotenv()
+env_file = dotenv.find_dotenv(usecwd=True)
 dotenv.load_dotenv(env_file)
 parsed_dotenv = dotenv.dotenv_values()
+
+print(env_file)
 raw_data_dir  = parsed_dotenv["phytooracle_data"]
 
 class RGB_Data(object):
