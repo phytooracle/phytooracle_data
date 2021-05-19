@@ -1,6 +1,6 @@
 import sys
 import os.path
-import pdb
+import os
 import glob
 import urllib.request
 import numpy as np
@@ -34,7 +34,7 @@ class RGB_Ind_Images(object):
     rgb = RGB_Ind_Images(season=10)
     """
 
-    def __init__(self, season=None, force_download=False, remove_anomalous_dates=True):
+    def __init__(self, season=None, force_download=False, number_plants=5):
         
         """
         /iplant/home/shared/phytooracle/season_10_lettuce_yr_2020/level_4/season10_individual_plants_2021-05-17.tar.gz
@@ -85,5 +85,51 @@ class RGB_Ind_Images(object):
             if result.returncode != 0:
                 log.critical(f"untaring did not complete successfully... {result}")
                 sys.exit(0)
+
+        list_pred_dates = self.season.dict['yield_prediction_dates']['rgb']
+        print(list_pred_dates)
+
+        images_dict = {}
+        list_folders = os.listdir(os.path.join(rgb_data_rawdir,rgb_images_filename.replace(".tar.gz","")))
+
+        for f in list_folders:
+            
+            single_image_files = os.listdir(os.path.join(rgb_data_rawdir,rgb_images_filename.replace(".tar.gz",""),f))
+            list_available_dates = [file.replace("_ortho_10pct_cubic.tif","") for file in single_image_files]
+            all_pred_dates_available =  all(elem in list_available_dates for elem in list_pred_dates)
+
+            # print('--------------------------')
+            # print(list_available_dates)
+            # print(list_pred_dates)
+            # print(all_pred_dates_available)
+            # print('--------------------------')
+            
+            if not all_pred_dates_available:
+                continue
+            
+            files_by_date = {}
+
+            for l in list_pred_dates:
+                files_by_date[l] = os.path.join(rgb_data_rawdir,rgb_images_filename.replace(".tar.gz",""),f,"{0}_ortho_10pct_cubic.tif".format(l))
+            
+
+            splitted = f.split("_")
+            range_column = splitted[-1]
+            
+            if range_column not in images_dict:
+                images_dict[range_column] = [files_by_date]
+            else:
+                images_dict[range_column].append(files_by_date)
+            
+
+        complete_images_dict = {}
+
+        for k in images_dict:
+            if len(images_dict[k])<5:
+                continue
+            else:
+                complete_images_dict[k] = images_dict[k][:5]
+            
+        self.images_sequences = complete_images_dict
             
             
