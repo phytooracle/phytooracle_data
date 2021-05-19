@@ -30,7 +30,7 @@ raw_data_dir  = parsed_dotenv["phytooracle_data"]
 
 class RGB_Ind_Images(object):
     """
-    from phytooracle_data.rgb import RGB_Ind_Images
+    from phytooracle_data.rgb_ind_images import RGB_Ind_Images
     rgb = RGB_Ind_Images(season=10)
     """
 
