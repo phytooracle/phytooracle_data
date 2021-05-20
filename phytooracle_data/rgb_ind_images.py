@@ -91,6 +91,8 @@ class RGB_Ind_Images(object):
         else:
             list_pred_dates = sequence_dates
         
+        self.list_dates = list_pred_dates
+
         print(list_pred_dates)
 
         images_dict = {}
