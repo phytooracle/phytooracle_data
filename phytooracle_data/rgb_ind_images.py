@@ -34,7 +34,7 @@ class RGB_Ind_Images(object):
     rgb = RGB_Ind_Images(season=10)
     """
 
-    def __init__(self, season=None, force_download=False, number_plants=5):
+    def __init__(self, season=None, force_download=False, number_plants=5, sequence_dates=None):
         
         """
         /iplant/home/shared/phytooracle/season_10_lettuce_yr_2020/level_4/season10_individual_plants_2021-05-17.tar.gz
@@ -86,7 +86,11 @@ class RGB_Ind_Images(object):
                 log.critical(f"untaring did not complete successfully... {result}")
                 sys.exit(0)
 
-        list_pred_dates = self.season.dict['yield_prediction_dates']['rgb']
+        if sequence_dates is None:
+            list_pred_dates = self.season.dict['yield_prediction_dates']['rgb']
+        else:
+            list_pred_dates = sequence_dates
+        
         print(list_pred_dates)
 
         images_dict = {}
@@ -125,10 +129,10 @@ class RGB_Ind_Images(object):
         complete_images_dict = {}
 
         for k in images_dict:
-            if len(images_dict[k])<5:
+            if len(images_dict[k])<number_plants:
                 continue
             else:
-                complete_images_dict[k] = images_dict[k][:5]
+                complete_images_dict[k] = images_dict[k][:number_plants]
             
         self.images_sequences = complete_images_dict
             
