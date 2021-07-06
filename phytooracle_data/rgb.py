@@ -82,6 +82,7 @@ class RGB_Data(object):
             
 
         logging.info(f"Reading RGB data from {rgb_data_filepath}")
+        self.rgb_data_filename = rgb_data_filepath
         df = pd.read_csv(rgb_data_filepath)
         df.drop(['Unnamed: 0'], axis=1, inplace=True)
         self.anomalous_dates = list(self.season.dict['anomalous_dates'].values())
