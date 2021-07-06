@@ -1,4 +1,4 @@
-import sys
+import sys,os
 import os.path
 import pdb
 import glob
@@ -7,9 +7,11 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
-
+import subprocess
 
 from phytooracle_data.seasons import Season
+from phytooracle_data.level1 import Level1BaseClass
+from phytooracle_data import get_data
 
 import logging
 logging.basicConfig(
@@ -24,8 +26,8 @@ env_file = dotenv.find_dotenv(usecwd=True)
 dotenv.load_dotenv(env_file)
 parsed_dotenv = dotenv.dotenv_values()
 
-print(env_file)
 raw_data_dir  = parsed_dotenv["phytooracle_data"]
+
 
 class RGB_Data(object):
     """
@@ -70,7 +72,6 @@ class RGB_Data(object):
             if shutil.which('iget') is None:
                 log.critical(f"You need to install irods so we can fetch the data")
                 sys.exit(0)
-            import subprocess
             # iget -N 0 -PVT /path/to/file
             irods_path = f"/iplant/home/shared/phytooracle/{self.season.name()}/level_3/stereoTop/season10_plant_clustering/stereoTop_full_season_clustering.csv"
             result = subprocess.run(["iget", "-N", "0", "-PVT", irods_path])
@@ -131,6 +132,7 @@ class RGB_Data(object):
         plot_df['column'] = plot_df['column'].str.zfill(2)
         plot_df['plot'] = plot_df['range']+plot_df['column']
         return plot_df
+
 
 
 """
