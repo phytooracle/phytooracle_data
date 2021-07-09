@@ -59,4 +59,22 @@ class Scanner3dTop(Level1BaseClass):
                 sys.exit(0)
 
         return os.path.join(self.local_base_data_path(),"heatmap_out")
-                
+    
+    def tar_upload_results(self,use_date):
+
+        folder_path = os.path.join(self.local_base_data_path(),"plant_coords_out")
+        tar_path = os.path.join(self.local_base_data_path(),f"{use_date}_plant_coords.tar.gz")
+        irods_dest = os.path.join(self.irods_base_data_path(),use_date, ".")
+
+        result = subprocess.run(["tar", "-cvf", tar_path, folder_path])
+        if result.returncode != 0:
+            log.critical(f"could not tar the results successfully... {result}")
+            sys.exit(0)
+        
+        result = subprocess.run(["iput", "-fKVPT", tar_path, irods_dest])
+        if result.returncode != 0:
+            log.critical(f"iput did not complete successfully... {result}")
+            sys.exit(0)
+            
+        print(":: Successfully uploaded to irods.")
+        
