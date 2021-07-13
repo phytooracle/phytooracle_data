@@ -1,5 +1,6 @@
 import sys
 import os.path
+import os
 import pdb
 import glob
 import urllib.request
@@ -62,15 +63,20 @@ class Scanner3dTop(Level1BaseClass):
     
     def tar_upload_results(self,use_date):
 
-        folder_path = os.path.join(self.local_base_data_path(),"plant_coords_out")
+        # folder_path = os.path.join(self.local_base_data_path(),"plant_coords_out")
         tar_path = os.path.join(self.local_base_data_path(),f"{use_date}_plant_coords.tar.gz")
         irods_dest = os.path.join(self.irods_base_data_path(),use_date, ".")
 
-        result = subprocess.run(["tar", "-cvf", tar_path, folder_path])
+        saved_working_directory = os.getcwd()
+        os.chdir(self.local_base_data_path())
+
+        result = subprocess.run(["tar", "-cvf", tar_path, "plant_coords_out"])
         if result.returncode != 0:
             log.critical(f"could not tar the results successfully... {result}")
             sys.exit(0)
         
+        os.chdir(saved_working_directory)
+
         result = subprocess.run(["iput", "-fKVPT", tar_path, irods_dest])
         if result.returncode != 0:
             log.critical(f"iput did not complete successfully... {result}")
