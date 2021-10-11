@@ -60,6 +60,45 @@ class Scanner3dTop(Level1BaseClass):
                 sys.exit(0)
 
         return os.path.join(self.local_base_data_path(),"heatmap_out")
+
+    def get_preprocessed_downsampled_merged_for_date(self,scan_date):
+        
+        tar_filename = f"{scan_date}_merged_downsampled_preprocessed.tar"
+        local_working_dir = os.path.join(self.local_base_data_path(), scan_date, "preprocessing")
+
+        irods_path_to_tar = os.path.join(self.irods_base_data_path(), scan_date, "preprocessing", tar_filename)
+        local_path_to_tar = os.path.join(local_working_dir, tar_filename)
+        
+        if not os.path.exists(os.path.join(local_working_dir, "merged_downsampled")):
+            get_data(local_path_to_tar, irods_path_to_tar)
+            result = subprocess.run(["tar", "-xvf", local_path_to_tar, "-C", local_working_dir])
+            if result.returncode != 0:
+                log.critical(f"untaring did not complete successfully... {result}")
+                sys.exit(0)
+            if os.path.exists(local_path_to_tar):
+                  os.remove(local_path_to_tar)
+
+        return os.path.join(local_working_dir, "merged_downsampled")
+    
+    def get_preprocessed_metadata_for_date(self,scan_date):
+        
+        tar_filename = f"{scan_date}_metadata.tar"
+        local_working_dir = os.path.join(self.local_base_data_path(), scan_date, "preprocessing")
+
+        irods_path_to_tar = os.path.join(self.irods_base_data_path(), scan_date, "preprocessing", tar_filename)
+        local_path_to_tar = os.path.join(local_working_dir, tar_filename)
+        
+        
+        if not os.path.exists(os.path.join(local_working_dir, "metadata")):
+            get_data(local_path_to_tar, irods_path_to_tar)
+            result = subprocess.run(["tar", "-xvf", local_path_to_tar, "-C", local_working_dir])
+            if result.returncode != 0:
+                log.critical(f"untaring did not complete successfully... {result}")
+                sys.exit(0)
+            if os.path.exists(local_path_to_tar):
+                  os.remove(local_path_to_tar)
+
+        return os.path.join(local_working_dir, "metadata")
     
     def tar_upload_results(self,use_date):
 
