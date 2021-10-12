@@ -56,6 +56,15 @@ def date_is_between(date, start_date, end_date):
     return False
 
 def find_nearest_date(list_of_dates, target_date):
+    if type(list_of_dates[0]) is str:
+        import datetime
+        datetime_format_string="%Y-%m-%d"
+        list_of_dates = [datetime.datetime.strptime(x, datetime_format_string) for x in list_of_dates]
+    if type(target_date) is str:
+        import datetime
+        datetime_format_string="%Y-%m-%d"
+        target_date = datetime.datetime.strptime(target_date, datetime_format_string)
+
     nearest_date = min(list_of_dates, key=lambda x: abs(x-target_date))
     #print(list_of_dates)
     #print(target_date)
