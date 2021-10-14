@@ -4,6 +4,9 @@ __pycache__/
 *$py.class
 
 *.swp
+*.swo
+
+tags
 
 # C extensions
 *.so

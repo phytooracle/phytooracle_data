@@ -13,6 +13,7 @@ season_config_yaml = """
     name: season_10_lettuce_yr_2020
     start_date: 2019-12-01
     end_date: 2020-03-04
+    flir_temp_units: "K"
     anomalous_dates:
         rgb:
             2020-03-02  # Say why this is anomalous
@@ -43,6 +44,7 @@ season_config_yaml = """
     name: season_12_sorghum_soybean_sunflower_tepary_yr_2021
     start_date: 2021-04-01
     end_date: 2021-09-09
+    flir_temp_units: "C"
 """
 
 seasons_dict = yaml.safe_load(season_config_yaml)

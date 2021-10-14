@@ -61,12 +61,23 @@ class Scanner3dTop(Level1BaseClass):
 
         return os.path.join(self.local_base_data_path(),"heatmap_out")
 
+
+    def irods_preprocessing_path(self, scan_date):
+        return os.path.join(self.irods_base_data_path(),scan_date,"preprocessing")
+    def local_preprocessing_path(self, scan_date):
+        return os.path.join(self.local_base_data_path(),scan_date,"preprocessing")
+    def irods_preprocessing_transformation_json_file_path(self, scan_date):
+        return os.path.join(self.irods_base_data_path(),scan_date,"preprocessing", "transfromation.json")
+    def local_preprocessing_transformation_json_file_path(self, scan_date):
+        return os.path.join(self.local_base_data_path(),scan_date,"preprocessing", "transfromation.json")
+
+
     def get_preprocessed_downsampled_merged_for_date(self,scan_date):
         
         tar_filename = f"{scan_date}_merged_downsampled_preprocessed.tar"
-        local_working_dir = os.path.join(self.local_base_data_path(), scan_date, "preprocessing")
+        local_working_dir = os.path.join(self.local_preprocessing_path(scan_date))
 
-        irods_path_to_tar = os.path.join(self.irods_base_data_path(), scan_date, "preprocessing", tar_filename)
+        irods_path_to_tar = os.path.join(self.irods_preprocessing_path(scan_date), tar_filename)
         local_path_to_tar = os.path.join(local_working_dir, tar_filename)
         
         if not os.path.exists(os.path.join(local_working_dir, "merged_downsampled")):
@@ -83,9 +94,9 @@ class Scanner3dTop(Level1BaseClass):
     def get_preprocessed_metadata_for_date(self,scan_date):
         
         tar_filename = f"{scan_date}_metadata.tar"
-        local_working_dir = os.path.join(self.local_base_data_path(), scan_date, "preprocessing")
+        local_working_dir = self.local_preprocessing_path(scan_date)
 
-        irods_path_to_tar = os.path.join(self.irods_base_data_path(), scan_date, "preprocessing", tar_filename)
+        irods_path_to_tar = os.path.join(self.irods_preprocessing_path(scan_date), tar_filename)
         local_path_to_tar = os.path.join(local_working_dir, tar_filename)
         
         
@@ -100,7 +111,29 @@ class Scanner3dTop(Level1BaseClass):
 
         return os.path.join(local_working_dir, "metadata")
     
+    def upload_transformation_json_file(self, scan_date, local_json_file_path=None):
+        """
+        This function is used by the Season 10 landmark-mased geocrorection GUI.
+        """
+
+        if local_json_file_path is None:
+            local_json_file_path = self.local_preprocessing_transformation_json_file_path(scan_date)
+
+        irods_dest = os.path.join(self.irods_preprocessing_path(scan_date), ".")
+
+        result = subprocess.run(["iput", "-fKVPT", local_json_file_path, irods_dest])
+        if result.returncode != 0:
+            log.critical(f"iput did not complete successfully... {result}")
+            sys.exit(0)
+            
+        print(":: Successfully uploaded to irods.")
+        
     def tar_upload_results(self,use_date):
+        """
+        DEPRECATED
+        This is horribly named.
+        It was used for the original manual GUI correction
+        """
 
         # folder_path = os.path.join(self.local_base_data_path(),"plant_coords_out")
         tar_path = os.path.join(self.local_base_data_path(),f"{use_date}_plant_coords.tar.gz")
