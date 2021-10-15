@@ -37,6 +37,9 @@ class Scanner3dTop(Level1BaseClass):
     """
     sensor_name = "scanner3DTop"    # This doesn't exist.  Overwrite when you use this class.
 
+    def initialize_paths(self):
+        self.pipeline_preprocessing_dir_to_use = "preprocessing"
+
     def get_dates(self):
         if len(self.file_list) == 0:
             self.get_file_list()
@@ -63,9 +66,9 @@ class Scanner3dTop(Level1BaseClass):
 
 
     def irods_preprocessing_path(self, scan_date):
-        return os.path.join(self.irods_base_data_path(),scan_date,"preprocessing")
+        return os.path.join(self.irods_base_data_path(),scan_date,self.pipeline_preprocessing_dir_to_use)
     def local_preprocessing_path(self, scan_date):
-        return os.path.join(self.local_base_data_path(),scan_date,"preprocessing")
+        return os.path.join(self.local_base_data_path(),scan_date,self.pipeline_preprocessing_dir_to_use)
     def irods_preprocessing_transformation_json_file_path(self, scan_date):
         return os.path.join(self.irods_base_data_path(),scan_date, "transfromation.json")
     def local_preprocessing_transformation_json_file_path(self, scan_date):
@@ -74,7 +77,13 @@ class Scanner3dTop(Level1BaseClass):
 
     def get_preprocessed_downsampled_merged_for_date(self,scan_date):
         
-        tar_filename = f"{scan_date}_merged_downsampled_preprocessed.tar"
+        if (self.pipeline_preprocessing_dir_to_use == 'preprocessing'):
+            tar_filename = f"{scan_date}_merged_downsampled_preprocessed.tar"
+        elif (self.pipeline_preprocessing_dir_to_use == 'alignment'):
+            tar_filename = f"{scan_date}_merged_downsampled_aligned.tar"
+        else:
+            log.critical(f"Can't get_preprocessed_downsampled_merged_for_date() because of unknown pipeline_preprocessing_dir_to_use value: {result}")
+
         local_working_dir = os.path.join(self.local_preprocessing_path(scan_date))
 
         irods_path_to_tar = os.path.join(self.irods_preprocessing_path(scan_date), tar_filename)

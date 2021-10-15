@@ -38,7 +38,13 @@ class Level1BaseClass(object):
             log.critical(f"You must provide {self.__class__} with a season or start and end dates")
             sys.exit(0)
 
+        self.initialize_paths()
+
         #self.irods_root_path = f"/iplant/home/shared/phytooracle/{self.season.name()}/level_1/{self.phytooracle_dir_name}"
+
+    def initialize_paths(self):
+        pass
+        return
 
     def base_data_path(self):
         """
