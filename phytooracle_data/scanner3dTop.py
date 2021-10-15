@@ -67,9 +67,9 @@ class Scanner3dTop(Level1BaseClass):
     def local_preprocessing_path(self, scan_date):
         return os.path.join(self.local_base_data_path(),scan_date,"preprocessing")
     def irods_preprocessing_transformation_json_file_path(self, scan_date):
-        return os.path.join(self.irods_base_data_path(),scan_date,"preprocessing", "transfromation.json")
+        return os.path.join(self.irods_base_data_path(),scan_date, "transfromation.json")
     def local_preprocessing_transformation_json_file_path(self, scan_date):
-        return os.path.join(self.local_base_data_path(),scan_date,"preprocessing", "transfromation.json")
+        return os.path.join(self.local_base_data_path(),scan_date, "transfromation.json")
 
 
     def get_preprocessed_downsampled_merged_for_date(self,scan_date):
