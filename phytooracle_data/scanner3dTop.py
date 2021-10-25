@@ -102,7 +102,11 @@ class Scanner3dTop(Level1BaseClass):
     
     def get_preprocessed_metadata_for_date(self,scan_date):
         
-        tar_filename = f"{scan_date}_metadata.tar"
+        if (self.pipeline_preprocessing_dir_to_use == 'preprocessing'):
+            tar_filename = f"{scan_date}_metadata_preprocessed.tar"
+        elif (self.pipeline_preprocessing_dir_to_use == 'alignment'):
+            tar_filename = f"{scan_date}_metadata_aligned.tar"
+
         local_working_dir = self.local_preprocessing_path(scan_date)
 
         irods_path_to_tar = os.path.join(self.irods_preprocessing_path(scan_date), tar_filename)
