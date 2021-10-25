@@ -38,11 +38,12 @@ class Ortho(Level1BaseClass):
     sensor_name = "stereoTop"    # This doesn't exist.  Overwrite when you use this class.
 
     def get_dates(self):
-        if len(self.file_list) == 0:
-            self.get_file_list()
-        wanted_files = [x.replace("  C- ", "") for x in self.file_list if x.endswith("reprocessed")]
-        self.dates = [x.split("/")[-1].replace("_reprocessed","") for x in wanted_files]
-        return self.dates
+        return self.season.dict['complete_field_dates']['rgb']
+#        if len(self.file_list) == 0:
+#            self.get_file_list()
+#        wanted_files = [x.replace("  C- ", "") for x in self.file_list if x.endswith("reprocessed")]
+#        self.dates = [x.split("/")[-1].replace("_reprocessed","") for x in wanted_files]
+#        return self.dates
 
     def get_ortho_for_date(self, date):
         #irods_path = f"/iplant/home/shared/phytooracle/{self.season.name()}/level_1/stereoTop/{date}_reprocessed/{date}_ortho_10pct_cubic.tif"
