@@ -119,7 +119,7 @@ class Scanner3dTop(Level1BaseClass):
 
         local_working_dir = self.local_preprocessing_path(scan_date)
 
-        dl_success = False
+        dl_success = True
 
         for tar_filename in possible_tar_filenames:
 
