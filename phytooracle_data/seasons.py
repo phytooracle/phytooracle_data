@@ -17,6 +17,7 @@ season_config_yaml = """
     anomalous_dates:
         rgb:
             2020-03-02  # Say why this is anomalous
+            2020-02-08  # Bad Ortho
     complete_field_dates:
         rgb:
             ['2020-01-14',
@@ -26,7 +27,7 @@ season_config_yaml = """
             '2020-01-29',
             '2020-01-31',
             '2020-02-03',
-            '2020-02-08',
+            #'2020-02-08',
             '2020-02-15',
             '2020-02-18',
             '2020-03-01',
