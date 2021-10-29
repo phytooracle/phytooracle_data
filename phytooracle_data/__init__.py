@@ -41,7 +41,7 @@ def get_data(local_path, irods_path, force_download=False, ignore_iget_error=Fal
             sys.exit(1)
         # iget -N 0 -PVT /path/to/file
         os.chdir(os.path.dirname(local_path))
-        result = subprocess.run(["iget", "-N", "0", "-PVT", irods_path])
+        result = subprocess.run(["iget", "-N", "0", "-KPVT", irods_path])
         if result.returncode != 0:
             if ignore_iget_error:
                 log.warning(f"iget did not complete successfully... {result}")
