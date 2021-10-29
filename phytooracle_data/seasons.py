@@ -16,7 +16,7 @@ season_config_yaml = """
     flir_temp_units: "K"
     anomalous_dates:
         rgb:
-            2020-03-02  # Say why this is anomalous
+            2020-03-02,  # Say why this is anomalous
             2020-02-08  # Bad Ortho
     complete_field_dates:
         rgb:
