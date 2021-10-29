@@ -114,8 +114,8 @@ class Scanner3dTop(Level1BaseClass):
             possible_tar_filenames.append(f"{scan_date}_metadata_preprocessed.tar")
             possible_tar_filenames.append(f"{scan_date}_metadata.tar")
         elif (self.pipeline_preprocessing_dir_to_use == 'alignment'):
-            possible_tar_filenames.append("{scan_date}_metadata.tar")
-            possible_tar_filenames.append("{scan_date}_metadata_aligned.tar")
+            possible_tar_filenames.append(f"{scan_date}_metadata.tar")
+            possible_tar_filenames.append(f"{scan_date}_metadata_aligned.tar")
 
         local_working_dir = self.local_preprocessing_path(scan_date)
 
