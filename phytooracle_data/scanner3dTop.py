@@ -41,9 +41,16 @@ class Scanner3dTop(Level1BaseClass):
         self.pipeline_preprocessing_dir_to_use = "preprocessing"
 
     def get_dates(self):
+        
         if len(self.file_list) == 0:
             self.get_file_list()
-        wanted_files = [x.replace("  C- ", "") for x in self.file_list if len(x.split("/")[-1].split("-")) == 3]
+        if self.season.season_number == 10:
+            wanted_files = [x.replace("  C- ", "") for x in self.file_list if len(x.split("/")[-1].split("-")) == 3]
+        if self.season.season_number == 11:
+            wanted_files = [x.replace("  C- ", "") for x in self.file_list if len(x.split("/")[-1].split("-")) == 3]
+        elif self.season.season_number == 12:
+            wanted_files = [x.replace("  C- ", "") for x in self.file_list if len(x.split("/")[-1].split("-")) == 6]
+
         self.dates = [x.split("/")[-1] for x in wanted_files]
         return self.dates
 
@@ -66,7 +73,17 @@ class Scanner3dTop(Level1BaseClass):
 
 
     def irods_preprocessing_path(self, scan_date):
-        return os.path.join(self.irods_base_data_path(),scan_date,self.pipeline_preprocessing_dir_to_use)
+        if self.season.season_number == 10:
+            return os.path.join(self.irods_base_data_path(),scan_date,self.pipeline_preprocessing_dir_to_use)
+        elif self.season.season_number == 11:
+            run_result = subprocess.run(["ils", os.path.join(self.irods_base_data_path())], stdout=subprocess.PIPE).stdout
+            lines = run_result.decode('utf-8').splitlines()
+            line = [l.split('/')[-1] for l in lines if scan_date in l]
+            date_timestamp = line[0]
+            return os.path.join(self.irods_base_data_path(),date_timestamp,self.pipeline_preprocessing_dir_to_use)
+        elif self.season.season_number == 12:
+            return os.path.join(self.irods_base_data_path(),"manual_approach",scan_date,self.pipeline_preprocessing_dir_to_use)
+
     def local_preprocessing_path(self, scan_date):
         return os.path.join(self.local_base_data_path(),scan_date,self.pipeline_preprocessing_dir_to_use)
     def irods_preprocessing_transformation_json_file_path(self, scan_date):
@@ -81,6 +98,7 @@ class Scanner3dTop(Level1BaseClass):
             tar_filename = f"{scan_date}_merged_downsampled_preprocessed.tar"
         elif (self.pipeline_preprocessing_dir_to_use == 'alignment'):
             tar_filename = f"{scan_date}_merged_downsampled_aligned.tar"
+            tar_filename = f"{scan_date}_west_downsampled.tar"
         else:
             log.critical(f"Can't get_preprocessed_downsampled_merged_for_date() because of unknown pipeline_preprocessing_dir_to_use value: {result}")
 

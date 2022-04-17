@@ -47,8 +47,21 @@ class Ortho(Level1BaseClass):
 
     def get_ortho_for_date(self, date):
         #irods_path = f"/iplant/home/shared/phytooracle/{self.season.name()}/level_1/stereoTop/{date}_reprocessed/{date}_ortho_10pct_cubic.tif"
-        ortho_date_dir = f"{date}_reprocessed"
-        ortho_filename = f"{date}_ortho_10pct_cubic.tif"
+        if self.season.season_number == 10:
+            ortho_date_dir = f"{date}_reprocessed"
+            ortho_filename = f"{date}_ortho_10pct_cubic.tif"
+        elif self.season.season_number == 11:
+            run_result = subprocess.run(["ils", os.path.join(self.irods_base_data_path())], stdout=subprocess.PIPE).stdout
+            lines = run_result.decode('utf-8').splitlines()
+            line = [l.split('/')[-1] for l in lines if date in l]
+            ortho_date_dir = line[0]
+            ortho_filename = f"{ortho_date_dir}_ortho_10pct_cubic.tif"
+            
+        elif self.season.season_number == 12:
+            ortho_date_dir = f"{date}"
+            ortho_filename = f"{date}_ortho_10pct_cubic.tif"
+            
+        
         irods_path = os.path.join(self.irods_base_data_path(),ortho_date_dir, ortho_filename)
         local_path = os.path.join(self.local_base_data_path(),ortho_date_dir, ortho_filename)
         get_data(local_path, irods_path)
