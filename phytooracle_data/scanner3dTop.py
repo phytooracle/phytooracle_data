@@ -120,27 +120,47 @@ class Scanner3dTop(Level1BaseClass):
     
     def get_preprocessed_metadata_for_date(self,scan_date):
         
+        # Get list of files so we can determine if we need to get
+        # date_metadata.tar or date_metadata_preprocessed.tar
+        print(f"getting directory list from: {self.pipeline_preprocessing_dir_to_use}")
+        run_result = subprocess.run(["ils", self.irods_base_data_path()], stdout=subprocess.PIPE).stdout
+        lines = run_result.decode('utf-8').splitlines()
+        self.file_list = lines
+
+        possible_tar_filenames = []
         if (self.pipeline_preprocessing_dir_to_use == 'preprocessing'):
-            tar_filename = f"{scan_date}_metadata_preprocessed.tar"
+            possible_tar_filenames.append(f"{scan_date}_metadata_preprocessed.tar")
+            possible_tar_filenames.append(f"{scan_date}_metadata.tar")
         elif (self.pipeline_preprocessing_dir_to_use == 'alignment'):
-            tar_filename = f"{scan_date}_metadata_aligned.tar"
+            possible_tar_filenames.append(f"{scan_date}_metadata.tar")
+            possible_tar_filenames.append(f"{scan_date}_metadata_aligned.tar")
 
         local_working_dir = self.local_preprocessing_path(scan_date)
 
-        irods_path_to_tar = os.path.join(self.irods_preprocessing_path(scan_date), tar_filename)
-        local_path_to_tar = os.path.join(local_working_dir, tar_filename)
-        
-        
-        if not os.path.exists(os.path.join(local_working_dir, "metadata")):
-            get_data(local_path_to_tar, irods_path_to_tar)
-            result = subprocess.run(["tar", "-xvf", local_path_to_tar, "-C", local_working_dir])
-            if result.returncode != 0:
-                log.critical(f"untaring did not complete successfully... {result}")
-                sys.exit(0)
-            if os.path.exists(local_path_to_tar):
-                  os.remove(local_path_to_tar)
+        dl_success = True
 
-        return os.path.join(local_working_dir, "metadata")
+        for tar_filename in possible_tar_filenames:
+
+            irods_path_to_tar = os.path.join(self.irods_preprocessing_path(scan_date), tar_filename)
+            local_path_to_tar = os.path.join(local_working_dir, tar_filename)
+        
+            if not os.path.exists(os.path.join(local_working_dir, "metadata")):
+                dl_success = get_data(local_path_to_tar, irods_path_to_tar, ignore_iget_error=True)
+                if not dl_success:
+                    print(f"Didn't find {tar_filename}")
+                    continue
+                result = subprocess.run(["tar", "-xvf", local_path_to_tar, "-C", local_working_dir])
+                if result.returncode != 0:
+                    log.critical(f"untaring did not complete successfully... {result}")
+                    sys.exit(1)
+                if os.path.exists(local_path_to_tar):
+                      os.remove(local_path_to_tar)
+
+        if dl_success:
+            return os.path.join(local_working_dir, "metadata")
+        else:
+            log.critical(f"Could not find a tar file to dl.  Tried: {possible_tar_filenames}")
+            sys.exit(0)
     
     def upload_transformation_json_file(self, scan_date, local_json_file_path=None):
         """

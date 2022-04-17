@@ -18,7 +18,7 @@ log = logging.getLogger(__name__)
 
 
 
-def get_data(local_path, irods_path, force_download=False):
+def get_data(local_path, irods_path, force_download=False, ignore_iget_error=False):
 
     need_to_download_data = False # Prove me wrong
     saved_working_directory = os.getcwd()
@@ -38,13 +38,17 @@ def get_data(local_path, irods_path, force_download=False):
         import shutil
         if shutil.which('iget') is None:
             log.critical(f"You need to install irods so we can fetch the data")
-            sys.exit(0)
+            sys.exit(1)
         # iget -N 0 -PVT /path/to/file
         os.chdir(os.path.dirname(local_path))
-        result = subprocess.run(["iget", "-N", "0", "-PVT", irods_path])
+        result = subprocess.run(["iget", "-N", "0", "-KPVT", irods_path])
         if result.returncode != 0:
-            log.critical(f"iget did not complete successfully... {result}")
-            sys.exit(0)
+            if ignore_iget_error:
+                log.warning(f"iget did not complete successfully... {result}")
+                return False
+            else:
+                log.critical(f"iget did not complete successfully... {result}")
+                sys.exit(1)
         os.chdir(saved_working_directory)
     return True
 
