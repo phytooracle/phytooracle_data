@@ -97,8 +97,11 @@ class Scanner3dTop(Level1BaseClass):
         if (self.pipeline_preprocessing_dir_to_use == 'preprocessing'):
             tar_filename = f"{scan_date}_merged_downsampled_preprocessed.tar"
         elif (self.pipeline_preprocessing_dir_to_use == 'alignment'):
-            tar_filename = f"{scan_date}_merged_downsampled_aligned.tar"
-            tar_filename = f"{scan_date}_west_downsampled.tar"
+            if self.season.season_number == 11:
+                tar_filename = f"{scan_date}_merged_downsampled.tar"    
+            else:
+                tar_filename = f"{scan_date}_merged_downsampled_aligned.tar"
+            # tar_filename = f"{scan_date}_west_downsampled.tar"
         else:
             log.critical(f"Can't get_preprocessed_downsampled_merged_for_date() because of unknown pipeline_preprocessing_dir_to_use value: {result}")
 
