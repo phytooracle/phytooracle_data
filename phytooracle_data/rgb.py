@@ -51,7 +51,11 @@ class RGB_Data(object):
 
         # Figure out if we need to download the data.
         need_to_download_data = False
-        rgb_data_filename = 'stereoTop_full_season_clustering.csv'
+        if self.season.season_number == 10:
+            rgb_data_filename = 'stereoTop_full_season_clustering.csv'
+        else:
+            rgb_data_filename = f'season_{self.season.season_number}_clustering.csv'
+
         season_dir_name = self.season.name()
         rgb_data_rawdir = os.path.join(raw_data_dir, season_dir_name)
         rgb_data_filepath = os.path.join(rgb_data_rawdir, rgb_data_filename)
@@ -73,7 +77,10 @@ class RGB_Data(object):
                 log.critical(f"You need to install irods so we can fetch the data")
                 sys.exit(0)
             # iget -N 0 -PVT /path/to/file
-            irods_path = f"/iplant/home/shared/phytooracle/{self.season.name()}/level_3/stereoTop/season10_plant_clustering/stereoTop_full_season_clustering.csv"
+            if self.season.season_number == 10:
+                irods_path = f"/iplant/home/shared/phytooracle/{self.season.name()}/level_3/stereoTop/season10_plant_clustering/{rgb_data_filename}"
+            else:
+                irods_path = f"/iplant/home/shared/phytooracle/{self.season.name()}/level_3/stereoTop/{rgb_data_filename}"
             result = subprocess.run(["iget", "-N", "0", "-PVT", irods_path])
             if result.returncode != 0:
                 log.critical(f"iget did not complete successfully... {result}")
