@@ -8,6 +8,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
 import subprocess
+import shutil
 
 from phytooracle_data.seasons import Season
 from phytooracle_data.level1 import Level1BaseClass
@@ -27,6 +28,15 @@ dotenv.load_dotenv(env_file)
 parsed_dotenv = dotenv.dotenv_values()
 
 raw_data_dir  = parsed_dotenv["phytooracle_data"]
+
+def get_command():
+    if shutil.which('iget') is not None:
+        return ["iget", "-N", "0", "-PVTK"]
+    elif os.path.isfile("/home/equant/bin/gocommands/bin/gocmd"):
+        return ["/home/equant/bin/gocommands/bin/gocmd", "get"]
+    else:
+        log.critical(f"You need to install irods (or gocommands) so we can fetch the data")
+        sys.exit(0)
 
 
 class RGB_Data(object):
@@ -72,16 +82,14 @@ class RGB_Data(object):
 
         if need_to_download_data:
             os.makedirs(rgb_data_rawdir, exist_ok=True)
-            import shutil
-            if shutil.which('iget') is None:
-                log.critical(f"You need to install irods so we can fetch the data")
-                sys.exit(0)
             # iget -N 0 -PVT /path/to/file
             if self.season.season_number == 10:
                 irods_path = f"/iplant/home/shared/phytooracle/{self.season.name()}/level_3/stereoTop/season10_plant_clustering/{rgb_data_filename}"
             else:
                 irods_path = f"/iplant/home/shared/phytooracle/{self.season.name()}/level_3/stereoTop/{rgb_data_filename}"
-            result = subprocess.run(["iget", "-N", "0", "-PVT", irods_path])
+            #result = subprocess.run(["iget", "-N", "0", "-PVTK", irods_path])
+            print(f'{" ".join(get_command() + [irods_path])}')
+            result = subprocess.run(get_command() + [irods_path])
             if result.returncode != 0:
                 log.critical(f"iget did not complete successfully... {result}")
                 sys.exit(0)
