@@ -31,13 +31,14 @@ class Level1BaseClass(object):
     file_list = []
     dates     = []
 
-    def __init__(self, season=None, force_download=False):
+    def __init__(self, season=None, force_download=False, specie="sorghum"):
         if season is not None:
             self.season = Season(season=season)
         else:
             log.critical(f"You must provide {self.__class__} with a season or start and end dates")
             sys.exit(0)
 
+        self.specie = specie
         self.initialize_paths()
 
         #self.irods_root_path = f"/iplant/home/shared/phytooracle/{self.season.name()}/level_1/{self.phytooracle_dir_name}"
@@ -50,7 +51,10 @@ class Level1BaseClass(object):
         """
         return example: 'season_10_lettuce_yr_2020/level_1/stereoTop/'
         """
-        return f"{self.season.name()}/level_1/{self.sensor_name}/"
+        if self.season.season_number == 12:
+            return f"{self.season.name()}/level_1/{self.sensor_name}/{self.specie}/"
+        else:
+            return f"{self.season.name()}/level_1/{self.sensor_name}/"
 
     def irods_base_data_path(self):
         """
