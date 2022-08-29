@@ -50,13 +50,13 @@ class Level1BaseClass(object):
         """
         return example: 'season_10_lettuce_yr_2020/level_1/stereoTop/'
         """
-        return f"{self.season.name()}/level_1/{self.sensor_name}/"
+        return f"{self.season.name()}/level_1/{self.sensor_name}/sorghum"
 
     def irods_base_data_path(self):
         """
         return example: '/iplant/home/shared/phytooracle/season_10_lettuce_yr_2020/level_1/stereoTop/'
         """
-        return f"/iplant/home/shared/phytooracle/" + self.base_data_path()
+        return f"/iplant/home/shared/phytooracle/" + self.base_data_path() + "sorghum/"
 
     def local_base_data_path(self):
         """
