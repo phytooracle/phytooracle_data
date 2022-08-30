@@ -82,7 +82,7 @@ class Scanner3dTop(Level1BaseClass):
             date_timestamp = line[0]
             return os.path.join(self.irods_base_data_path(),date_timestamp,self.pipeline_preprocessing_dir_to_use)
         elif self.season.season_number == 12:
-            return os.path.join(self.irods_base_data_path(),"manual_approach",scan_date,self.pipeline_preprocessing_dir_to_use)
+            return os.path.join(self.irods_base_data_path(),scan_date,self.pipeline_preprocessing_dir_to_use)
 
     def local_preprocessing_path(self, scan_date):
         return os.path.join(self.local_base_data_path(),scan_date,self.pipeline_preprocessing_dir_to_use)
@@ -98,10 +98,11 @@ class Scanner3dTop(Level1BaseClass):
             tar_filename = f"{scan_date}_merged_downsampled_preprocessed.tar"
         elif (self.pipeline_preprocessing_dir_to_use == 'alignment'):
             if self.season.season_number == 11:
+                tar_filename = f"{scan_date}_merged_downsampled.tar"
+            elif self.season.season_number == 12:
                 tar_filename = f"{scan_date}_merged_downsampled.tar"    
             else:
                 tar_filename = f"{scan_date}_merged_downsampled_aligned.tar"
-            # tar_filename = f"{scan_date}_west_downsampled.tar"
         else:
             log.critical(f"Can't get_preprocessed_downsampled_merged_for_date() because of unknown pipeline_preprocessing_dir_to_use value: {result}")
 
