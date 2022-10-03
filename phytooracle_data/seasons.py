@@ -247,8 +247,7 @@ season_config_yaml = """
                 '2022-08-12__10-39-22-016_sorghum',
                 '2022-08-15__10-41-22-100_sorghum',
                 '2022-08-18__10-44-16-814_sorghum',
-                '2022-08-19__10-42-50-612_sorghum',
-                '2222-01-01__11-08-16-257_sorghum']
+                '2022-08-19__10-42-50-612_sorghum']
 """
 
 seasons_dict = yaml.safe_load(season_config_yaml)
