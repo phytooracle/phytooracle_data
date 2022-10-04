@@ -176,7 +176,7 @@ class Scanner3dTop(Level1BaseClass):
 
         irods_dest = os.path.join(self.irods_preprocessing_path(scan_date), ".")
 
-        result = subprocess.run(["iput", "-fKVPT", local_json_file_path, irods_dest])
+        result = subprocess.run(["iput", "-t", "UMPaNFZroscm4gw", "-fKVPT", local_json_file_path, irods_dest])
         if result.returncode != 0:
             log.critical(f"iput did not complete successfully... {result}")
             sys.exit(0)
