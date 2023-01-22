@@ -48,7 +48,7 @@ class Scanner3dTop(Level1BaseClass):
             wanted_files = [x.replace("  C- ", "") for x in self.file_list if len(x.split("/")[-1].split("-")) == 3]
         if self.season.season_number == 11:
             wanted_files = [x.replace("  C- ", "") for x in self.file_list if len(x.split("/")[-1].split("-")) == 3]
-        elif (self.season.season_number == 12) or (self.season.season_number == 14):
+        elif self.season.season_number >= 12:
             wanted_files = [x.replace("  C- ", "") for x in self.file_list if len(x.split("/")[-1].split("-")) == 6]
 
         self.dates = [x.split("/")[-1] for x in wanted_files]
@@ -81,7 +81,7 @@ class Scanner3dTop(Level1BaseClass):
             line = [l.split('/')[-1] for l in lines if scan_date in l]
             date_timestamp = line[0]
             return os.path.join(self.irods_base_data_path(),date_timestamp,self.pipeline_preprocessing_dir_to_use)
-        elif (self.season.season_number == 12) or (self.season.season_number == 14):
+        elif self.season.season_number >= 12:
             return os.path.join(self.irods_base_data_path(),scan_date,self.pipeline_preprocessing_dir_to_use)
 
     def local_preprocessing_path(self, scan_date):
@@ -99,7 +99,7 @@ class Scanner3dTop(Level1BaseClass):
         elif (self.pipeline_preprocessing_dir_to_use == 'alignment'):
             if self.season.season_number == 11:
                 tar_filename = f"{scan_date}_merged_downsampled.tar"
-            elif (self.season.season_number == 12) or (self.season.season_number == 14):
+            elif self.season.season_number >= 12:
                 tar_filename = f"{scan_date}_merged_downsampled.tar"    
             else:
                 tar_filename = f"{scan_date}_merged_downsampled_aligned.tar"
