@@ -51,7 +51,7 @@ class Level1BaseClass(object):
         """
         return example: 'season_10_lettuce_yr_2020/level_1/stereoTop/'
         """
-        if (self.season.season_number == 12) or (self.season.season_number == 14):
+        if self.season.season_number >= 12:
             return f"{self.season.name()}/level_1/{self.sensor_name}/{self.specie}/"
         else:
             return f"{self.season.name()}/level_1/{self.sensor_name}/"
