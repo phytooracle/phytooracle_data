@@ -57,7 +57,7 @@ class Ortho(Level1BaseClass):
             ortho_date_dir = line[0]
             ortho_filename = f"{ortho_date_dir}_ortho_10pct_cubic.tif"
             
-        elif (self.season.season_number == 12) or (self.season.season_number == 14):
+        elif self.season.season_number >= 12:
             ortho_date_dir = f"{date}"
             ortho_filename = f"{date}_ortho_10pct_cubic.tif"
             
