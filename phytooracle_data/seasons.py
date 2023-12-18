@@ -208,7 +208,8 @@ season_config_yaml = """
                 '2022-03-15__11-12-27-310_lettuce']
 
 14:
-    name: season_14_sorghum_yr_2022
+    name: season_14_sorghum_yr_2022_reprocessing
+    # name: season_14_sorghum_yr_2022
     start_date: 2022-04-23
     end_date: 2022-08-19
     flir_temp_units: "C"
