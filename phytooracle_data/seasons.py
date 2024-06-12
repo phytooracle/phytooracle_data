@@ -371,8 +371,7 @@ season_config_yaml = """
     flir_temp_units: "C"
     complete_field_dates:
             rgb: 
-                ["2024-01-16__00-00-00-000_lettuce",
-                #"2024-01-16__17-13-13-000_lettuce",
+                ["2024-01-16__17-13-13-000_lettuce",
                 "2024-01-18__16-59-16-000_lettuce",
                 "2024-01-24__18-06-05-000_lettuce",
                 "2024-01-26__17-02-36-000_lettuce",
